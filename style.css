@@ -1,3 +1,9 @@
 canvas{
-    border: 10px black solid;
+    border: 10px solid pink;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+
 }
