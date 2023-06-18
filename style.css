@@ -1,3 +1,13 @@
+@font-face {
+    font-family: pixel;
+    src: url(/snake/PublicPixel-z84yD.ttf);
+  }
+body{
+    font-family: pixel;
+    background-color: black;
+    color: white;
+  }
+
 canvas{
     border: 10px solid pink;
 }
@@ -6,4 +16,22 @@ body{
     display: flex;
     justify-content: center;
 
+}
+
+#white-space{
+    width: 10vw;
+}
+
+#name{
+    border: none;
+    font-family: pixel;
+    font-size: 30px;
+    background-color: black;
+    color: white;
+    height: 35px;
+    width: 95px;
+}
+
+#name{
+    color: red;
 }

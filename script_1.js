@@ -6,13 +6,13 @@ Array.prototype.sample = function () {
 };
 
 let squares = [
-  0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375,
-  400, 425, 450, 475,
+  25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400,
+  425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750,
 ];
 let mode_array = [
   "blue",
   "rainbow",
-  "normal",
+  "aaaaaa",
   "normal",
   "normal",
   "normal",
@@ -20,10 +20,6 @@ let mode_array = [
   "normal",
   "normal",
 ];
-let a_x;
-let a_y;
-let p_x;
-let p_y;
 
 let ex_p = [];
 
@@ -31,14 +27,43 @@ let direc = "up";
 let loopcount = 0;
 let score = 2;
 let p_size = 25;
-let g_size = 20;
+let g_size = 32;
 let tik = 100;
 let mode = "normal";
 let p_x_pos = [];
 let p_y_pos = [];
+let a_x;
+let a_y;
+let p_x;
+let p_y;
+let o_x;
+let o_y;
 
-// tableCreate();
-drawApple();
+let random_x;
+let random_y;
+
+// drawApple();
+
+let obstacle_array = [1, 1, 1, 2, 2, 3];
+
+shuffleObstacle();
+
+function shuffleObstacle() {
+  random_x = obstacle_array.sample();
+  random_y = obstacle_array.sample();
+  o_x = squares.sample();
+  o_y = squares.sample();
+  return;
+}
+
+function drawObstacle() {
+  context.beginPath();
+  context.rect(o_x, o_y, p_size * random_x, p_size * random_y);
+  context.fillStyle = "#0000ff";
+  context.closePath();
+  context.fill();
+  
+}
 
 function drawApple(player) {
   if (mode == "rainbow") {
@@ -61,24 +86,10 @@ function drawApple(player) {
     context.closePath();
     context.fill();
   }
-  for (let i = 0; i < score; i++){
-    if (
-    a_x[p_x_pos.length - 2 - i] == p_x &&
-    a_y[p_y_pos.length - 2 - i] == p_y
-  ) {
-    drawApplePause(i)
-  }
-  function drawApplePause(pause){
-    if (pause < score + 5){
 
-    } else {
-      drawApple();
-    }
-  }
-  }
-  
   if (player == true) {
-    drawPlayerStart();
+    drawPlayer();
+  } else {
   }
 }
 drawPlayerStart();
@@ -115,55 +126,80 @@ document.addEventListener("keydown", function (event) {
     if (direc != "right") {
       direc = "left";
       if (p_x < 0) {
-        p_x = 475;
+        p_x = g_size * p_size - p_size;
       }
     }
   } else if (event.keyCode == 38) {
     if (direc != "down") {
       direc = "up";
       if (p_y < 0) {
-        p_y = 475;
+        p_y = g_size * p_size - p_size;
       }
     }
   } else if (event.keyCode == 39) {
     if (direc != "left") {
       direc = "right";
-      if (p_x > 475) {
+      if (p_x > g_size * p_size - p_size) {
         p_x = 0;
       }
     }
   } else if (event.keyCode == 40) {
     if (direc != "up") {
       direc = "down";
-      if (p_y > 475) {
+      if (p_y > g_size * p_size - p_size) {
         p_y = 0;
       }
     }
   }
-  document.getElementById("dirc").innerHTML = "Direction: " + direc;
 });
 let rainbow_array = ["red", "orange", "yellow", "green", "blue", "purple"];
 let colour;
 let count = 0;
-/////////////// Timer ///////////////
-setInterval(timer, tik);
-let highscores;
-let dataArray = [];
-function timer() {
-  highscores = getHighscores();
-  highscores
+
+const getHighscores = async () => {
+  return await fetch("get_highscore.php", {
+    method: "GET",
+    mode: "same-origin",
+    credentials: "same-origin",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
     .then((data) => {
-      dataArray = data;
-      // console.log(dataArray);
-      for (let i = 0; i < dataArray.length; i++) {
-        // document.getElementById(i).innerHTML = dataArray[i].name;
-        // document.getElementById("0_" + i).innerHTML = dataArray[i].score;
-      }
-    })
-    .catch((error) => {
-      console.error(error);
+      return data;
     });
+};
+/////////////// Timer ///////////////
+
+let highscores;
+
+highscores = getHighscores();
+highscores
+  .then((data) => {
+    dataArray = data;
+    console.log(dataArray);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+let loop_delay = 1;
+let loop = 0;
+setInterval(function () {
+  if (loop < 1) {
+    tableCreate();
+  }
+  loop++;
+}, 300 * loop_delay);
+let done = false;
+timer();
+setInterval(timer, tik);
+
+function timer() {
   dirc = direc;
+  drawObstacle();
   if (mode == "rainbow") {
     count++;
     if (count == 100) {
@@ -174,34 +210,33 @@ function timer() {
   if (dirc == "left") {
     p_x += -p_size;
     if (p_x < 0 && mode != "blue") {
-      p_x = 475;
+      p_x = g_size * p_size - p_size;
     } else if (mode == "blue" && p_x < 0) {
       gameover();
     }
   } else if (dirc == "up") {
     p_y += -p_size;
     if (p_y < 0 && mode != "blue") {
-      p_y = 475;
+      p_y = g_size * p_size - p_size;
     } else if (mode == "blue" && p_y < 0) {
       gameover();
     }
   } else if (dirc == "right") {
     p_x += p_size;
-    if (p_x > 475 && mode != "blue") {
+    if (p_x > g_size * p_size - p_size && mode != "blue") {
       p_x = 0;
-    } else if (mode == "blue" && p_x > 475) {
+    } else if (mode == "blue" && p_x > g_size * p_size - p_size) {
       gameover();
     }
   } else if (dirc == "down") {
     p_y += p_size;
-    if (p_y > 475 && mode != "blue") {
+    if (p_y > g_size * p_size - p_size && mode != "blue") {
       p_y = 0;
-    } else if (mode == "blue" && p_y > 475) {
+    } else if (mode == "blue" && p_y > g_size * p_size - p_size) {
       gameover();
     }
   }
 
-  document.getElementById("dirc").innerHTML = "Direction: " + dirc;
   context.clearRect(0, 0, p_size * g_size, p_size * g_size);
   // drawApple
   context.beginPath();
@@ -219,7 +254,7 @@ function timer() {
     drawApple();
   } else {
     context.beginPath();
-    context.rect(p_x, p_y, p_size, p_size);
+    context.rect(p_x, p_y, p_size-, p_size);
     context.fillStyle = "#00ff00";
     context.closePath();
     context.fill();
@@ -227,14 +262,27 @@ function timer() {
   p_x_pos.push(p_x);
   p_y_pos.push(p_y);
   let c = 0;
+
+  ///////// self collision /////////
+
   for (let i = 0; i < score; i++, c++) {
     if (
       p_x_pos[p_x_pos.length - 2 - i] == p_x &&
       p_y_pos[p_y_pos.length - 2 - i] == p_y
     ) {
-      console.log("game-over");
-      gameover();
+      if (mode != "aaaaaa") {
+        console.log("game-over");
+        gameover();
+      }
     }
+    if (
+      p_x_pos[p_x_pos.length - 2 - i] == a_x &&
+      p_y_pos[p_y_pos.length - 2 - i] == a_y
+    ) {
+      console.log("inside you!");
+      drawApple();
+    }
+
     context.beginPath();
     context.rect(
       p_x_pos[p_x_pos.length - 1 - i],
@@ -249,14 +297,20 @@ function timer() {
       }
       context.fillStyle = rainbow_array[c];
     } else if (mode == "normal") {
-      context.fillStyle = i % 2 ? "#00de00" : "hotpink";
+      context.fillStyle = "#00ff00";
     } else if (mode == "blue") {
       context.fillStyle = "#0000ff";
+    } else if (mode == "aaaaaa") {
+      context.fillStyle = "#aaaaaa";
     }
     context.closePath();
     context.fill();
   }
 }
+
+setTimeout(function () {
+  tableCreate();
+}, tik * 4);
 
 const setHighscore = async (name, score) => {
   return await fetch("set_highscore.php", {
@@ -274,59 +328,48 @@ const setHighscore = async (name, score) => {
       return data;
     });
 };
-const getHighscores = async () => {
-  return await fetch("get_highscore.php", {
-    method: "GET",
-    mode: "same-origin",
-    credentials: "same-origin",
-    headers: {
-      Accept: "application/json, text/plain, */*",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      return data;
-    });
-};
 
 function gameover() {
+  let username = "DIP";
+  if (document.getElementById("name").value != "DIP") {
+    username = document.getElementById("name").value;
+  }
+  username = username.toUpperCase();
   context.fillStyle = "red";
   context.fillRect(0, 0, 500, 500);
-  document.cookie = score;
-  alert("game over \nscore: " + score);
-  let username = document.getElementById("name").value;
-  username = username.toUpperCase();
+  alert("Game Over \nScore: " + score + "\nUser: " + username);
   setHighscore(username, score);
-
   score = 2;
+  document.getElementById("score").innerHTML = "Score: " + score;
   tableCreate();
   drawApple(true);
 }
 
 function tableCreate() {
-    const body = document.body,
-          tbl = document.createElement('table');
-    tbl.style.width = '100px';
-    tbl.style.border = '1px solid black';
-  
-    for (let i = 0; i < 6; i++) {
-      const tr = tbl.insertRow();
-      for (let j = 0; j < 2; j++) {
-          const td = tr.insertCell();
-          if (j == 0){
-            let name = dataArray[i].name;
-            td.appendChild(document.createTextNode(name));
-          } else if (j == 1){
-            let score = dataArray[i].score;
-            td.appendChild(document.createTextNode(score));
-          }
-          
-          td.style.border = '1px solid black';
-        }
-    }
-    document.getElementById("leader-board").appendChild(tbl);
-    
+  if (done == true) {
+    document.getElementById("table").remove();
   }
-  
+  const body = document.body,
+    tbl = document.createElement("table");
+  tbl.id = "table";
+  tbl.style.width = "150px";
+  tbl.style.border = "1px solid black";
 
+  for (let i = 0; i < 6; i++) {
+    const tr = tbl.insertRow();
+    for (let j = 0; j < 2; j++) {
+      const td = tr.insertCell();
+      if (j == 0) {
+        console.log(dataArray);
+        let name = dataArray[i].name;
+        td.appendChild(document.createTextNode(name));
+      } else if (j == 1) {
+        let score = dataArray[i].score;
+        td.appendChild(document.createTextNode(score));
+      }
+      td.style.border = "1px solid white";
+    }
+  }
+  document.getElementById("leader-board").appendChild(tbl);
+  done = true;
+}
