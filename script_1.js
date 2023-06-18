@@ -7,7 +7,7 @@ Array.prototype.sample = function () {
 
 let squares = [
   25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400,
-  425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750,
+  425, 450, 475, 500, 525, 550, 575, 600, 625, 650
 ];
 let mode_array = [
   "blue",
@@ -27,9 +27,11 @@ let direc = "up";
 let loopcount = 0;
 let score = 2;
 let p_size = 25;
-let g_size = 32;
+let g_size = 28;
 let tik = 100;
 let mode = "normal";
+let clicked = false;
+
 let p_x_pos = [];
 let p_y_pos = [];
 let a_x;
@@ -62,7 +64,7 @@ function drawObstacle() {
   context.fillStyle = "#0000ff";
   context.closePath();
   context.fill();
-  
+
 }
 
 function drawApple(player) {
@@ -122,6 +124,8 @@ function reDrawPlayer() {
 
 /////////////// Button ///////////////
 document.addEventListener("keydown", function (event) {
+  if(clicked == false){
+    clicked = true;
   if (event.keyCode == 37) {
     if (direc != "right") {
       direc = "left";
@@ -151,13 +155,14 @@ document.addEventListener("keydown", function (event) {
       }
     }
   }
+}
 });
 let rainbow_array = ["red", "orange", "yellow", "green", "blue", "purple"];
 let colour;
 let count = 0;
 
 const getHighscores = async () => {
-  return await fetch("get_highscore.php", {
+  return await fetch("php-database/get_highscore.php", {
     method: "GET",
     mode: "same-origin",
     credentials: "same-origin",
@@ -198,6 +203,7 @@ timer();
 setInterval(timer, tik);
 
 function timer() {
+  clicked = false
   dirc = direc;
   drawObstacle();
   if (mode == "rainbow") {
@@ -254,7 +260,7 @@ function timer() {
     drawApple();
   } else {
     context.beginPath();
-    context.rect(p_x, p_y, p_size-, p_size);
+    context.rect(p_x, p_y, p_size, p_size);
     context.fillStyle = "#00ff00";
     context.closePath();
     context.fill();
@@ -313,7 +319,7 @@ setTimeout(function () {
 }, tik * 4);
 
 const setHighscore = async (name, score) => {
-  return await fetch("set_highscore.php", {
+  return await fetch("php-database/set_highscore.php", {
     method: "POST",
     mode: "same-origin",
     credentials: "same-origin",

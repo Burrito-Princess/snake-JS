@@ -1,7 +1,11 @@
 @font-face {
     font-family: pixel;
-    src: url(/snake/PublicPixel-z84yD.ttf);
+    src: url(PublicPixel-z84yD.ttf);
   }
+.zoom{
+    zoom: 90%;
+  }
+  
 body{
     font-family: pixel;
     background-color: black;
