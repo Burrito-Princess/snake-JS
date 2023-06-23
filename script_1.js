@@ -7,7 +7,7 @@ Array.prototype.sample = function () {
 
 let squares = [
   25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400,
-  425, 450, 475, 500, 525, 550, 575, 600, 625, 650
+  425, 450, 475, 500, 525, 550, 575, 600, 625, 650,
 ];
 let mode_array = [
   "blue",
@@ -41,6 +41,9 @@ let p_y;
 let o_x;
 let o_y;
 
+let point = document.getElementById("point");
+let gameover_sound = document.getElementById("gameover");
+
 let random_x;
 let random_y;
 
@@ -64,7 +67,6 @@ function drawObstacle() {
   context.fillStyle = "#0000ff";
   context.closePath();
   context.fill();
-
 }
 
 function drawApple(player) {
@@ -124,38 +126,38 @@ function reDrawPlayer() {
 
 /////////////// Button ///////////////
 document.addEventListener("keydown", function (event) {
-  if(clicked == false){
+  if (clicked == false) {
     clicked = true;
-  if (event.keyCode == 37) {
-    if (direc != "right") {
-      direc = "left";
-      if (p_x < 0) {
-        p_x = g_size * p_size - p_size;
+    if (event.keyCode == 37) {
+      if (direc != "right") {
+        direc = "left";
+        if (p_x < 0) {
+          p_x = g_size * p_size - p_size;
+        }
       }
-    }
-  } else if (event.keyCode == 38) {
-    if (direc != "down") {
-      direc = "up";
-      if (p_y < 0) {
-        p_y = g_size * p_size - p_size;
+    } else if (event.keyCode == 38) {
+      if (direc != "down") {
+        direc = "up";
+        if (p_y < 0) {
+          p_y = g_size * p_size - p_size;
+        }
       }
-    }
-  } else if (event.keyCode == 39) {
-    if (direc != "left") {
-      direc = "right";
-      if (p_x > g_size * p_size - p_size) {
-        p_x = 0;
+    } else if (event.keyCode == 39) {
+      if (direc != "left") {
+        direc = "right";
+        if (p_x > g_size * p_size - p_size) {
+          p_x = 0;
+        }
       }
-    }
-  } else if (event.keyCode == 40) {
-    if (direc != "up") {
-      direc = "down";
-      if (p_y > g_size * p_size - p_size) {
-        p_y = 0;
+    } else if (event.keyCode == 40) {
+      if (direc != "up") {
+        direc = "down";
+        if (p_y > g_size * p_size - p_size) {
+          p_y = 0;
+        }
       }
     }
   }
-}
 });
 let rainbow_array = ["red", "orange", "yellow", "green", "blue", "purple"];
 let colour;
@@ -203,7 +205,7 @@ timer();
 setInterval(timer, tik);
 
 function timer() {
-  clicked = false
+  clicked = false;
   dirc = direc;
   drawObstacle();
   if (mode == "rainbow") {
@@ -253,6 +255,7 @@ function timer() {
   // drawPlayer
   if (p_x == a_x && p_y == a_y) {
     score++;
+    point.play();
     if (mode == "rainbow") {
       score++;
     }
@@ -314,9 +317,9 @@ function timer() {
   }
 }
 
-setTimeout(function () {
-  tableCreate();
-}, tik * 4);
+// setTimeout(function () {
+//   tableCreate();
+// }, tik/4);
 
 const setHighscore = async (name, score) => {
   return await fetch("php-database/set_highscore.php", {
@@ -337,18 +340,19 @@ const setHighscore = async (name, score) => {
 
 function gameover() {
   let username = "DIP";
+  gameover_sound.play();
   if (document.getElementById("name").value != "DIP") {
     username = document.getElementById("name").value;
   }
   username = username.toUpperCase();
   context.fillStyle = "red";
   context.fillRect(0, 0, 500, 500);
-  alert("Game Over \nScore: " + score + "\nUser: " + username);
   setHighscore(username, score);
-  score = 2;
   document.getElementById("score").innerHTML = "Score: " + score;
+  
   tableCreate();
   drawApple(true);
+  score = 2;
 }
 
 function tableCreate() {
@@ -366,7 +370,6 @@ function tableCreate() {
     for (let j = 0; j < 2; j++) {
       const td = tr.insertCell();
       if (j == 0) {
-        console.log(dataArray);
         let name = dataArray[i].name;
         td.appendChild(document.createTextNode(name));
       } else if (j == 1) {
